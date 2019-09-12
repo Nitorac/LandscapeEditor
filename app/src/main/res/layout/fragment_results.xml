@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootResultsLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResultsFragment">
+
+
+    <ImageView
+        android:id="@+id/resultImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="5dp"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/brush_0" />
+
+    <com.dd.processbutton.iml.ActionProcessButton
+        android:id="@+id/validateBtn"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:text="Valider"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:pb_colorComplete="@color/green_complete"
+        app:pb_colorNormal="@color/blue_normal"
+        app:pb_colorPressed="@color/blue_pressed"
+        app:pb_colorProgress="@color/purple_progress"
+        app:pb_textComplete="Succès !"
+        app:pb_textProgress="Chargement ..."
+        app:pb_textError="Erreur :("
+        app:pb_colorError="@color/red_error" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

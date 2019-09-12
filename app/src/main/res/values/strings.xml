@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Créateur de paysages</string>
+    <string name="title_brush">Pinceau</string>
+    <string name="title_input">Entrée</string>
+    <string name="title_results">Résultats</string>
+    <string name="loading_fragments">Chargement des fragments …</string>
+</resources>
