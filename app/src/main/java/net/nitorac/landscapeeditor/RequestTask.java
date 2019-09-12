@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 
+import androidx.appcompat.app.AlertDialog;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -52,12 +54,7 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
             resFrag.resView.setImageBitmap(resBitmap);
         }
         resFrag.validateBtn.setProgress(res);
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resFrag.validateBtn.setProgress(0);
-            }
-        }, 5000);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> resFrag.validateBtn.setProgress(0), 5000);
     }
 
     @Override
@@ -109,18 +106,20 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
             }
         }
 
-        RequestBody formBody = new FormBody.Builder()
-                .add("imageBase64", "data:image/png;base64," + inputEncoded)
-                .add("name", name)
-                .build();
-        Request submitReq = new Request.Builder()
-                .url(MainActivity.REQ_URL)
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .post(formBody)
-                .build();
-
         try {
+
+            RequestBody formBody = new FormBody.Builder()
+                    .add("imageBase64", "data:image/png;base64," + inputEncoded)
+                    .add("name", name)
+                    .build();
+            Request submitReq = new Request.Builder()
+                    .url(MainActivity.REQ_URL)
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0")
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .post(formBody)
+                    .build();
+
+
             Response response = httpClient.newCall(submitReq).execute();
             if(!response.isSuccessful() || response.body() == null){
                 System.out.println(response.body());
@@ -146,9 +145,14 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
             }
             bmp = BitmapFactory.decodeStream(finalResp.body().byteStream());
             return 100;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            MainActivity.getInstance().runOnUiThread(() -> new AlertDialog.Builder(MainActivity.getInstance())
+                    .setTitle("Erreur")
+                    .setMessage("Une erreur est survenue (" + e.getMessage() + ")\nVérifiez que vous êtes bien connecté à Internet")
+                    .setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss())
+                    .show());
+            return -2;
         }
-        return null;
     }
 }

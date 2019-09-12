@@ -209,7 +209,10 @@ public class InputFragment extends ActionMenuFragment {
                     .setTitle("Confirmation")
                     .setMessage("Voulez-vous vraiment créer une nouvelle image ?")
                     .setNegativeButton("Annuler", (dialogInterface, i) -> dialogInterface.dismiss())
-                    .setPositiveButton("Oui", (dialogInterface, i) -> drawingView.clear())
+                    .setPositiveButton("Oui", (dialogInterface, i) -> {
+                        drawingView.clear();
+                        drawingView.setBackgroundImage(null);
+                    })
                     .create();
             dialog.show();
             return true;
