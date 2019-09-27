@@ -11,6 +11,8 @@ import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,7 +25,6 @@ import java.net.URL;
 
 public class NitoInstaller extends Handler {
     private static final String TAG = "NitoInstaller";
-    private static volatile NitoInstaller mNitoInstaller;
     private Context mContext;
     private String mTempPath;
     private NitoInstaller.MODE mMode;
@@ -33,19 +34,6 @@ public class NitoInstaller extends Handler {
         this.mTempPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         this.mMode = NitoInstaller.MODE.BOTH;
         this.mContext = context;
-    }
-
-    public static NitoInstaller getDefault(Context context) {
-        if (mNitoInstaller == null) {
-            Class var1 = NitoInstaller.class;
-            synchronized (NitoInstaller.class) {
-                if (mNitoInstaller == null) {
-                    mNitoInstaller = new NitoInstaller(context);
-                }
-            }
-        }
-
-        return mNitoInstaller;
     }
 
     public void setOnStateChangedListener(NitoInstaller.OnStateChangedListener onStateChangedListener) {
@@ -94,8 +82,7 @@ public class NitoInstaller extends Handler {
                         errorStream.close();
                     }
                 } catch (IOException var16) {
-                    outputStream = null;
-                    errorStream = null;
+                    ;
                     process.destroy();
                 }
 
@@ -111,26 +98,14 @@ public class NitoInstaller extends Handler {
         intent.setDataAndType(uri, "application/vnd.android.package-archive");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         this.mContext.startActivity(intent);
-        /*if (!this.isAccessibilitySettingsOn(this.mContext)) {
-            this.toAccessibilityService();
-            this.sendEmptyMessage(3);
-        }*/
-
     }
 
     public void install(final String filePath) {
         if (!TextUtils.isEmpty(filePath) && filePath.endsWith(".apk")) {
             (new Thread(() -> {
                 NitoInstaller.this.sendEmptyMessage(1);
-                switch (NitoInstaller.this.mMode) {
-                    case BOTH:
-                        /*fefzf*/
-                        break;
-                    case ROOT_ONLY:
-                        NitoInstaller.this.installUseRoot(filePath);
-                        break;
-                    case AUTO_ONLY:
-                        NitoInstaller.this.installUseAS(filePath);
+                if (NitoInstaller.this.mMode == MODE.AUTO_ONLY) {
+                    NitoInstaller.this.installUseAS(filePath);
                 }
 
                 NitoInstaller.this.sendEmptyMessage(0);
@@ -140,7 +115,7 @@ public class NitoInstaller extends Handler {
         }
     }
 
-    public void handleMessage(Message msg) {
+    public void handleMessage(@NotNull Message msg) {
         super.handleMessage(msg);
         switch (msg.what) {
             case 0:
@@ -172,12 +147,10 @@ public class NitoInstaller extends Handler {
     }
 
     public void installFromUrl(final String httpUrl) {
-        (new Thread(new Runnable() {
-            public void run() {
-                NitoInstaller.this.sendEmptyMessage(1);
-                File file = NitoInstaller.this.downLoadFile(httpUrl);
-                NitoInstaller.this.install(file);
-            }
+        (new Thread(() -> {
+            NitoInstaller.this.sendEmptyMessage(1);
+            File file = NitoInstaller.this.downLoadFile(httpUrl);
+            NitoInstaller.this.install(file);
         })).start();
     }
 
