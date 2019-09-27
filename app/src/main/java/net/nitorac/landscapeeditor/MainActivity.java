@@ -23,6 +23,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.charset.StandardCharsets;
+
 import top.wuhaojie.installerlibrary.AutoInstaller;
 
 public class MainActivity extends AppCompatActivity implements InputFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener {
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
                         new AlertDialog.Builder(MainActivity.this)
                                 .setTitle("Mise à jour disponible")
                                 .setIcon(R.drawable.ic_download)
-                                .setMessage("Une nouvelle mise à jour est disponible (" + BuildConfig.VERSION_NAME + " -> " + update.getLatestVersion() + ")\nVoici les nouveautés : " + update.getReleaseNotes() + "\n\nVoulez-vous mettre à jour l'application ?")
+                                .setMessage("Une nouvelle mise à jour est disponible (" + BuildConfig.VERSION_NAME + " -> " + new String(update.getLatestVersion().getBytes(StandardCharsets.UTF_8)) + ")\n\nVoici les nouveautés : \n" + update.getReleaseNotes() + "\n\nVoulez-vous mettre à jour l'application ?")
                                 .setPositiveButton("Mettre à jour", (dialogInterface, i) -> new AutoInstaller.Builder(MainActivity.this)
                                         .setMode(AutoInstaller.MODE.AUTO_ONLY)
                                         .build()

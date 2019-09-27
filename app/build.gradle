@@ -31,12 +31,13 @@ android {
 
 task writeJSON {
     def libraries = new File("update.json")
-    libraries.text = '{\n' +
+    libraries.setText('{\n' +
             '  "latestVersion": "' + appVersionName + '",\n' +
             '  "latestVersionCode": ' + appVersionCode + ',\n' +
             '  "url": "https://raw.githubusercontent.com/Nitorac/LandscapeEditor/master/app/release/app-release.apk",\n' +
             '  "releaseNotes": ' + changelogs +
-            '\n}'
+            '\n}',
+            "UTF-8")
 }
 
 build.dependsOn writeJSON

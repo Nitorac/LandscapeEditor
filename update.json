@@ -2,5 +2,8 @@
   "latestVersion": "1.2.0",
   "latestVersionCode": 3,
   "url": "https://raw.githubusercontent.com/Nitorac/LandscapeEditor/master/app/release/app-release.apk",
-  "releaseNotes": ["- Ajout d'un système de mise à jour", "- Correction du système de navigation"]
+  "releaseNotes": [
+    "- Ajout d'un systÃ¨me de mise Ã  jour",
+    "- Correction du systÃ¨me de navigation"
+  ]
 }
