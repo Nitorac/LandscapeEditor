@@ -15,9 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.github.javiersantos.appupdater.AppUpdaterUtils;
+import com.github.javiersantos.appupdater.enums.AppUpdaterError;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
+import com.github.javiersantos.appupdater.objects.Update;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.jetbrains.annotations.NotNull;
+
+import top.wuhaojie.installerlibrary.AutoInstaller;
 
 public class MainActivity extends AppCompatActivity implements InputFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener {
 
@@ -30,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
     public ResultsFragment resultsFragment;
 
     public static Fragment currentFragment;
+    public static AppUpdaterUtils appUpdater;
 
     public Bitmap inputImage;
     public int savedStyle;
@@ -74,6 +81,35 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
         navView.setSelectedItemId(R.id.navigation_input);
 
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        appUpdater = new AppUpdaterUtils(this)
+                .setUpdateFrom(UpdateFrom.JSON)
+                .setUpdateJSON("https://raw.githubusercontent.com/Nitorac/LandscapeEditor/master/update.json")
+                .withListener(new AppUpdaterUtils.UpdateListener() {
+                    @Override
+                    public void onSuccess(Update update, Boolean isUpdateAvailable) {
+                        if (!isUpdateAvailable) {
+                            return;
+                        }
+
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Mise à jour disponible")
+                                .setIcon(R.drawable.ic_download)
+                                .setMessage("Une nouvelle mise à jour est disponible (" + BuildConfig.VERSION_NAME + " -> " + update.getLatestVersion() + ")\nVoici les nouveautés : " + update.getReleaseNotes() + "\n\nVoulez-vous mettre à jour l'application ?")
+                                .setPositiveButton("Mettre à jour", (dialogInterface, i) -> new AutoInstaller.Builder(MainActivity.this)
+                                        .setMode(AutoInstaller.MODE.AUTO_ONLY)
+                                        .build()
+                                        .installFromUrl(update.getUrlToDownload().toExternalForm()))
+                                .setNegativeButton("Annuler", (dialogInterface, i) -> dialogInterface.dismiss())
+                                .setCancelable(false)
+                                .create().show();
+                    }
+
+                    @Override
+                    public void onFailed(AppUpdaterError error) {
+
+                    }
+                });
+        appUpdater.start();
     }
 
     @Override
