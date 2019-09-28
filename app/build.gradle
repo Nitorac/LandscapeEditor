@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 
 ext {
-    appVersionCode = 5
-    appVersionName = "1.4.0"
-    changelogs = '["- Ajout d\'un système de mise à jour", "- Correction du système pager"]'
+    appVersionCode = 8
+    appVersionName = "1.7.2"
+    changelogs = '[" - Ajout d\'un système de mise à jour", " - Ajout de la sauvegarde de l\'input", " - Ajout du style random", " - Image par défaut modifiée"]'
 }
 
 android {

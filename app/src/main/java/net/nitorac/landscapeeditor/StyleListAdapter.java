@@ -32,10 +32,11 @@ public class StyleListAdapter extends ArrayAdapter<Integer> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        String style = position == 0 ? "random" : String.valueOf(position - 1);
         convertView = LayoutInflater.from(MainActivity.getInstance()).inflate(R.layout.style_item, parent, false);
-        ((ImageView) convertView.findViewById(R.id.styleItemImage)).setImageResource(frag.getResources().getIdentifier("s" + position, "drawable", MainActivity.getInstance().getPackageName()));
+        ((ImageView) convertView.findViewById(R.id.styleItemImage)).setImageResource(frag.getResources().getIdentifier("s" + style, "drawable", MainActivity.getInstance().getPackageName()));
         convertView.setOnClickListener(v -> {
-            frag.updateStyle(position);
+            frag.updateStyle(style);
             if (frag.getStyleDialog() != null && frag.getStyleDialog().isShowing()) {
                 frag.getStyleDialog().dismiss();
             }

@@ -43,6 +43,7 @@ public class ResultsFragment extends ActionMenuFragment {
     private OnFragmentInteractionListener mListener;
 
     public Bitmap currentBitmap = createImage(512, 512, -1);
+    public Bitmap lastBitmap;
 
     public ActionProcessButton validateBtn;
     public ImageView resView;
@@ -81,7 +82,10 @@ public class ResultsFragment extends ActionMenuFragment {
 
         validateBtn.setOnClickListener(v1 -> {
             if (validateBtn.getProgress() == 0) {
-                reqTask = new RequestTask(ResultsFragment.this);
+                boolean hasToRandom = MainActivity.getInstance().inputImage.sameAs(lastBitmap) && MainActivity.getInstance().savedStyle.equals("random");
+                reqTask = new RequestTask(ResultsFragment.this, hasToRandom);
+                Log.i("ResultFrag", "HasToUpdateRandom : " + hasToRandom);
+                lastBitmap = MainActivity.getInstance().inputImage;
                 reqTask.execute();
             }
         });

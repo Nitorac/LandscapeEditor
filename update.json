@@ -1,9 +1,11 @@
 {
-  "latestVersion": "1.4.0",
-  "latestVersionCode": 5,
+  "latestVersion": "1.7.2",
+  "latestVersionCode": 8,
   "url": "https://raw.githubusercontent.com/Nitorac/LandscapeEditor/master/app/release/app-release.apk",
   "releaseNotes": [
-    "- Ajout d'un système de mise à jour",
-    "- Correction du système pager"
+    " - Ajout d'un système de mise à jour",
+    " - Ajout de la sauvegarde de l'input",
+    " - Ajout du style random",
+    " - Image par défaut modifiée"
   ]
 }

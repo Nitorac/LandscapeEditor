@@ -13,10 +13,10 @@
     <dimen name="calligraphy_max_stroke_size">30dp</dimen>
     <dimen name="calligraphy_min_stroke_size">3dp</dimen>
 
-    <dimen name="eraser_max_stroke_size">30dp</dimen>
-    <dimen name="eraser_min_stroke_size">1dp</dimen>
+    <dimen name="eraser_max_stroke_size">60dp</dimen>
+    <dimen name="eraser_min_stroke_size">4dp</dimen>
 
-    <dimen name="pen_min_stroke_size">4dp</dimen>
     <dimen name="pen_max_stroke_size">60dp</dimen>
+    <dimen name="pen_min_stroke_size">4dp</dimen>
 
 </resources>

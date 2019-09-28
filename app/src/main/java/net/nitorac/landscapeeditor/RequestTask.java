@@ -36,9 +36,13 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
     private ResultsFragment resFrag;
     private Bitmap bmp;
     private Bitmap resBitmap;
+    private boolean hasToUpdateRandom;
 
-    public RequestTask(ResultsFragment resFrag){
+    public static String name;
+
+    public RequestTask(ResultsFragment resFrag, boolean hasToUpdateRandom) {
         this.resFrag = resFrag;
+        this.hasToUpdateRandom = hasToUpdateRandom;
     }
 
     @Override
@@ -54,7 +58,7 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
             resFrag.resView.setImageBitmap(resBitmap);
         }
         resFrag.validateBtn.setProgress(res);
-        new Handler(Looper.getMainLooper()).postDelayed(() -> resFrag.validateBtn.setProgress(0), 5000);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> resFrag.validateBtn.setProgress(0), 1500);
     }
 
     @Override
@@ -62,13 +66,13 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
         OkHttpClient httpClient = new OkHttpClient();
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        Bitmap.createScaledBitmap(((MainActivity)resFrag.getActivity()).inputImage, 512, 512, false).compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        Bitmap.createScaledBitmap(MainActivity.getInstance().inputImage, 512, 512, false).compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream .toByteArray();
         String inputEncoded = Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         int randomNumber = new Random().nextInt(1000000000);
-        String name = format.format(new Date()) + ", " + System.currentTimeMillis() + "-" + randomNumber;
+        name = (name == null) ? format.format(new Date()) + ", " + System.currentTimeMillis() + "-" + randomNumber : name;
 
         if (MainActivity.REQ_URL.isEmpty() || MainActivity.RECEIVE_URL.isEmpty()) {
             try {
@@ -100,6 +104,7 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
                     }
                     MainActivity.REQ_URL = found + "/nvidia_gaugan_submit_map";
                     MainActivity.RECEIVE_URL = found + "/nvidia_gaugan_receive_image";
+                    MainActivity.RANDOM_URL = found + "/update_random";
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -107,6 +112,23 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
         }
 
         try {
+            if (hasToUpdateRandom) {
+                RequestBody formBody2 = new FormBody.Builder()
+                        .add("name", name)
+                        .build();
+                Request receiveReq = new Request.Builder()
+                        .url(MainActivity.RANDOM_URL)
+                        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0")
+                        .post(formBody2)
+                        .build();
+
+                Response finalResp = httpClient.newCall(receiveReq).execute();
+
+                if (!finalResp.isSuccessful() || finalResp.body() == null) {
+                    System.out.println(finalResp.body());
+                    return -1;
+                }
+            }
 
             RequestBody formBody = new FormBody.Builder()
                     .add("imageBase64", "data:image/png;base64," + inputEncoded)
@@ -128,8 +150,7 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
 
             RequestBody formBody2 = new FormBody.Builder()
                     .add("name", name)
-                    .add("style_name", String.valueOf(MainActivity.getInstance().savedStyle))
-                    .add("artistic_style_name", "none")
+                    .add("style_name", MainActivity.getInstance().savedStyle)
                     .build();
             Request receiveReq = new Request.Builder()
                     .url(MainActivity.RECEIVE_URL)
@@ -140,7 +161,7 @@ public class RequestTask extends AsyncTask<Void, Void, Integer> {
             Response finalResp = httpClient.newCall(receiveReq).execute();
 
             if(!finalResp.isSuccessful() || finalResp.body() == null){
-                System.out.println(response.body());
+                System.out.println(finalResp.body());
                 return -1;
             }
             bmp = BitmapFactory.decodeStream(finalResp.body().byteStream());

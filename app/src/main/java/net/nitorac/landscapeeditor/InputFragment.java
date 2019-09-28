@@ -41,7 +41,7 @@ import java.util.Arrays;
 public class InputFragment extends ActionMenuFragment {
     private OnFragmentInteractionListener mListener;
 
-    public DrawingView drawingView;
+    public static DrawingView drawingView;
     private ColorView colorView;
     private SeekBar sizeView;
     private BrushView brushView;
@@ -93,8 +93,6 @@ public class InputFragment extends ActionMenuFragment {
             if (set.getSelectedBrush() == Brushes.PEN) {
                 set.setSelectedBrush(Brushes.FILL);
             } else if (set.getSelectedBrush() == Brushes.FILL) {
-                set.setSelectedBrush(Brushes.ERASER);
-            } else if (set.getSelectedBrush() == Brushes.ERASER) {
                 set.setSelectedBrush(Brushes.PEN);
             }
         });
@@ -104,7 +102,7 @@ public class InputFragment extends ActionMenuFragment {
             styleDialog.setContentView(R.layout.style_dialog);
 
             ListView listView = styleDialog.findViewById(R.id.styleDialogList);
-            StyleListAdapter adapter = new StyleListAdapter(InputFragment.this, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+            StyleListAdapter adapter = new StyleListAdapter(InputFragment.this, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
 
             listView.setAdapter(adapter);
             styleDialog.show();
@@ -138,16 +136,17 @@ public class InputFragment extends ActionMenuFragment {
             }
         });
 
+        drawingView.setBackgroundImage(MainActivity.getInstance().inputImage);
+        updateStyle(MainActivity.getInstance().savedStyle);
+
         if(currentBundle != null){
-            drawingView.setBackgroundImage(MainActivity.getInstance().inputImage);
             sizeView.setProgress(currentBundle.getInt("savedSize"));
             updateColor(ColorView.getColorFromInt(currentBundle.getInt("savedColor")));
             drawingView.getBrushSettings().setSelectedBrush(currentBundle.getInt("savedBrush"));
-            updateStyle(MainActivity.getInstance().savedStyle);
         }else{
             sizeView.setProgress(25);
             updateColor(colorView.getColor());
-            updateStyle(0);
+            updateStyle("random");
         }
         return v;
     }
@@ -160,7 +159,7 @@ public class InputFragment extends ActionMenuFragment {
         return styleDialog;
     }
 
-    public void updateStyle(int style) {
+    public void updateStyle(String style) {
         stylePreview.setImageResource(getResources().getIdentifier("s" + style, "drawable", MainActivity.getInstance().getPackageName()));
         MainActivity.getInstance().savedStyle = style;
     }
@@ -189,11 +188,21 @@ public class InputFragment extends ActionMenuFragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if (drawingView != null && drawingView.exportDrawingWithoutBackground() != null) {
+            MainActivity.getInstance().inputImage = drawingView.exportDrawing();
+            MainActivity.getInstance().saveImage();
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
         currentBundle = new Bundle();
         MainActivity.getInstance().inputImage = drawingView.exportDrawing();
+        MainActivity.getInstance().saveImage();
         currentBundle.putInt("savedSize", sizeView.getProgress());
         currentBundle.putInt("savedColor", colorView.getColor().getColor());
         currentBundle.putInt("savedBrush", drawingView.getBrushSettings().getSelectedBrush());
@@ -211,7 +220,7 @@ public class InputFragment extends ActionMenuFragment {
                     .setNegativeButton("Annuler", (dialogInterface, i) -> dialogInterface.dismiss())
                     .setPositiveButton("Oui", (dialogInterface, i) -> {
                         drawingView.clear();
-                        drawingView.setBackgroundImage(null);
+                        drawingView.setBackgroundImage(MainActivity.getInstance().BASE_BITMAP);
                     })
                     .create();
             dialog.show();
