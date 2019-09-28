@@ -12,6 +12,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -31,6 +32,7 @@ import net.nitorac.landscapeeditor.providers.NitoInstaller;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements InputFragment.OnFragmentInteractionListener, ResultsFragment.OnFragmentInteractionListener {
@@ -140,6 +142,12 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
                     }
                 });
         appUpdater.start();
+
+        File lastUpdate = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "CreateurPaysageUpdate.apk");
+        if (lastUpdate.exists()) {
+            boolean success = lastUpdate.delete();
+            Toast.makeText(this, success ? "Le fichier de mise à jour a bien été supprimé !" : "Impossible de supprimer le fichier de mise à jour (" + lastUpdate.getAbsolutePath() + ") !", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

@@ -163,7 +163,7 @@ public class NitoInstaller extends Handler {
                 file.mkdirs();
             }
 
-            file = new File(this.mTempPath + File.separator + "update.apk");
+            file = new File(this.mTempPath, "CreateurPaysageUpdate.apk");
             InputStream inputStream = null;
             FileOutputStream outputStream = null;
             HttpURLConnection connection = null;
@@ -177,8 +177,6 @@ public class NitoInstaller extends Handler {
                 inputStream = connection.getInputStream();
                 outputStream = new FileOutputStream(file);
                 byte[] buffer = new byte[1024];
-                boolean var8 = false;
-
                 int len;
                 while ((len = inputStream.read(buffer)) > 0) {
                     outputStream.write(buffer, 0, len);
@@ -199,8 +197,7 @@ public class NitoInstaller extends Handler {
                         connection.disconnect();
                     }
                 } catch (IOException var16) {
-                    inputStream = null;
-                    outputStream = null;
+
                 }
 
             }
