@@ -24,6 +24,7 @@ import com.github.javiersantos.appupdater.enums.AppUpdaterError;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.github.javiersantos.appupdater.objects.Update;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.roger.catloadinglibrary.CatLoadingView;
 
 import net.nitorac.landscapeeditor.providers.NitoInstaller;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
     public static AppUpdaterUtils appUpdater;
 
     public SharedPreferences sharedPreferences;
+    public CatLoadingView catDialog;
 
     public Bitmap inputImage;
     public String savedStyle;
@@ -115,11 +117,18 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
                                 .setTitle("Mise à jour disponible")
                                 .setIcon(R.drawable.ic_download)
                                 .setMessage("Une nouvelle mise à jour est disponible (" + BuildConfig.VERSION_NAME + " -> " + update.getLatestVersion() + ")\n\nVoici les nouveautés : \n" + update.getReleaseNotes() + "\n\nVoulez-vous mettre à jour l'application ?")
-                                .setPositiveButton("Mettre à jour", (dialogInterface, i) -> new NitoInstaller.Builder(MainActivity.this)
-                                        .setMode(NitoInstaller.MODE.AUTO_ONLY)
-                                        .setCacheDirectory(Environment.getExternalStorageDirectory().getAbsolutePath())
-                                        .build()
-                                        .installFromUrl(update.getUrlToDownload().toExternalForm()))
+                                .setPositiveButton("Mettre à jour", (dialogInterface, i) -> {
+                                    catDialog = new CatLoadingView();
+                                    catDialog.setCanceledOnTouchOutside(false);
+                                    catDialog.show(getSupportFragmentManager(), "CatLoading");
+                                    catDialog.setText("S M I R K . . .");
+
+                                    new NitoInstaller.Builder(MainActivity.this)
+                                            .setMode(NitoInstaller.MODE.AUTO_ONLY)
+                                            .setCacheDirectory(Environment.getExternalStorageDirectory().getAbsolutePath())
+                                            .build()
+                                            .installFromUrl(update.getUrlToDownload().toExternalForm());
+                                })
                                 .setNegativeButton("Annuler", (dialogInterface, i) -> dialogInterface.dismiss())
                                 .setCancelable(false)
                                 .create().show();
@@ -131,6 +140,14 @@ public class MainActivity extends AppCompatActivity implements InputFragment.OnF
                     }
                 });
         appUpdater.start();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (catDialog != null) {
+            catDialog.dismiss();
+        }
     }
 
     @Override
